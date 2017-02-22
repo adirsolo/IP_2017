@@ -24,6 +24,7 @@ app.use(bodyParser.json());       // to support JSON-encoded bodies
     connection2.on('connect', function(err) {  
         // If no error, then good to proceed.  
         console.log("Connected Azure");  
+        
          
     });  
 
@@ -34,9 +35,11 @@ var connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   port: '3306',
-  password: '1234',
+  password: '123qweasd',
   database: 'sakila'
 });
+
+
 connection.getConnection(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -47,26 +50,26 @@ connection.getConnection(function(err) {
 });
 
 
-
-
 app.get('/insertActorGet', function (req, res) {
   
-console.log(req.query.id); 
-	var DBInsertion = {actor_id: req.query.id, first_name: "erez", last_name: "shalom", last_update: iso8601.toDate(new Date().toISOString())};
+console.log(req.query.id);
 
-	var data = {actor_id: DBInsertion.actor_id, first_name: DBInsertion.first_name, last_name: DBInsertion.last_name, last_update: DBInsertion.last_update};
-    DButils.insert(connection, "actor", data, function(insertStatus){
- 			if(insertStatus){
-                 res.send('success to insert new token thing')
-                console.log("success to insert new token thing");   
-            } else {
-                console.log("Failed to insert new token thing");
-            }
+var DBInsertion = {actor_id: req.query.id, first_name: "erez", last_name: "shalom", last_update: iso8601.toDate(new Date().toISOString())};
 
+var data = {actor_id: DBInsertion.actor_id, first_name: DBInsertion.first_name, last_name: DBInsertion.last_name, last_update: DBInsertion.last_update};
+DButils.insert(connection, "actor", data, function(insertStatus){
+		if(insertStatus){
+             res.send('success to insert new token thing')
+            console.log("success to insert new token thing");   
+        } else {
+            console.log("Failed to insert new token thing");
+        }
 
-    });
+executeStatement();
 
-  console.log("Hello World!");
+});
+
+console.log("Hello World!");
 })
 
 
@@ -95,6 +98,31 @@ console.log(req.query.id);
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 })
+
+
+ var Request = require('tedious').Request;  
+    var TYPES = require('tedious').TYPES;  
+
+     function executeStatement() {  
+        request = new Request("INSERT user (userName, firstName, lastName, password) VALUES (erez, shalom, shalom, 324234);", function(err) {  
+         if (err) {  
+            console.log(err);}  
+        });  
+        request.addParameter('UserName', TYPES.VarChar);  
+        request.addParameter('firstName', TYPES.VarChar);  
+        request.addParameter('lastName', TYPES.VarChar);  
+        request.addParameter('password', TYPES.VarChar);  
+        request.on('row', function(columns) {  
+            columns.forEach(function(column) {  
+              if (column.value === null) {  
+                console.log('NULL');  
+              } else {  
+                console.log("Product id of inserted item is " + column.value);  
+              }  
+            });  
+        });       
+        connection2.execSql(request);  
+    }
 
 
 
